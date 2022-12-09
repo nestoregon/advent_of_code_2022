@@ -30,9 +30,7 @@ def get_tail_visit_of_rope(input: List[str], length: int) -> int:
         for _ in range(int(value)):
             # udpate head 
             hx, hy = rope[0]
-            hx += dx
-            hy += dy
-            rope[0] = hx, hy
+            rope[0] = hx+dx, hy+dy
             # simulate tail concat movement
             for i in range(length - 1):
                 # get two points
@@ -44,10 +42,10 @@ def get_tail_visit_of_rope(input: List[str], length: int) -> int:
                 # tail shouldn't move
                 if abs(diff_x) <= 1 and abs(diff_y) <= 1:
                     continue
-                if diff_x != 0:
-                    tx += diff_x // abs(diff_x) # +1 or -1
-                if diff_y != 0:
-                    ty += diff_y // abs(diff_y)
+                # only sum if not 0
+                tx += 0 if diff_x == 0 else diff_x // abs(diff_x) # +1 or -1
+                ty += 0 if diff_y == 0 else diff_y // abs(diff_y) # +1 or -1
+
                 rope[i+1] = tx, ty  # update tail value
             visited_by_tail.append(rope[-1])  # only append final tail
     return len(set(visited_by_tail))  # return unique visited

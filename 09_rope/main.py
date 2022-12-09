@@ -28,32 +28,29 @@ def get_tail_visit_of_rope(input: List[str], length: int) -> int:
         direction, value = instruction.split()
         dx, dy = LETTER_TO_DIRECTION[direction]
         for _ in range(int(value)):
+            # udpate head 
             hx, hy = rope[0]
-            hx += dx  # update head only
+            hx += dx
             hy += dy
             rope[0] = hx, hy
-
+            # simulate tail concat movement
             for i in range(length - 1):
+                # get two points
                 hx, hy = rope[i]
                 tx, ty = rope[i + 1]
-
-                # update tail
+                # difference
                 diff_x = hx - tx
                 diff_y = hy - ty
+                # tail shouldn't move
                 if abs(diff_x) <= 1 and abs(diff_y) <= 1:
-                    continue  # tail is touching
-
-                if abs(diff_x) == 2 or abs(diff_y) == 2:
-                    if diff_x != 0:
-                        tx += diff_x // abs(diff_x)
-                    if diff_y != 0:
-                        ty += diff_y // abs(diff_y)
-
-                rope[i+1] = tx, ty
-
-            visited_by_tail.append(rope[-1])
-
-    return len(set(visited_by_tail))
+                    continue
+                if diff_x != 0:
+                    tx += diff_x // abs(diff_x) # +1 or -1
+                if diff_y != 0:
+                    ty += diff_y // abs(diff_y)
+                rope[i+1] = tx, ty  # update tail value
+            visited_by_tail.append(rope[-1])  # only append final tail
+    return len(set(visited_by_tail))  # return unique visited
 
 
 def main():

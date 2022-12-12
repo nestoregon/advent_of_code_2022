@@ -100,6 +100,7 @@ def remove_nodes(nodes: List[Node], map, value_matrix: List[List[int]], ex, ey):
 
 
 def get_path_inverse(map: List[str]):
+    print('problem 2')
     sx, sy = locate_character(map, 'E')
     value_matrix = initialize_map(map, -1)
 
@@ -149,7 +150,7 @@ def get_path_inverse(map: List[str]):
 
 
 def get_path(map: List[str]):
-
+    print('problem 1')
     sx, sy = locate_character(map, 'S')
     ex, ey = locate_character(map, 'E')
     # visited = initialize_map(map, '.')

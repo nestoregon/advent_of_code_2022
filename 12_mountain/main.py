@@ -52,10 +52,10 @@ def sort_nodes_based_on_score(nodes: List[Node], reverse=True) -> List[Node]:
     return sorted(nodes, key=lambda x: x.score, reverse=reverse)
 
 
-def get_fewest_steps_to_reach_destination(map: List[str], start: str, end: str, uphill: bool):
+def get_fewest_steps_to_reach_destination(map: List[str], start_char: str, end_char: str, uphill: bool):
 
     # initialize variables
-    current_x, current_y = locate_character(map, start)
+    current_x, current_y = locate_character(map, start_char)
     value_matrix = initialize_copy_of_map_with_default_value(map, value=-1)
     value_matrix[current_x][current_y] = 1  # keeping track of node iterations
     min_value = None
@@ -70,7 +70,7 @@ def get_fewest_steps_to_reach_destination(map: List[str], start: str, end: str, 
         height = get_map_height_from_letter(map[node.x][node.y])
 
         # for each of the 4 directions
-        # all "continue" are instances where new nodes are not good.
+        # all "continue" are used to skip to the next direction because node is invalid
         for dx, dy in MOVEMENTS_TO_ARROWS:
             nx = node.x + dx
             ny = node.y + dy
@@ -93,7 +93,7 @@ def get_fewest_steps_to_reach_destination(map: List[str], start: str, end: str, 
             value_matrix[nx][ny] = node.iterations
 
             # are we there yet?
-            if map[nx][ny] == end:
+            if map[nx][ny] == end_char:
                 if min_value is None:
                     min_value = node.iterations
                 else:
@@ -116,15 +116,15 @@ def main():
     map = read_input_as_lines('input.txt')
     value_uphill = get_fewest_steps_to_reach_destination(
         map,
-        start='S',
-        end='E',
+        start_char='S',
+        end_char='E',
         uphill=True,
     )
 
     value_downhill = get_fewest_steps_to_reach_destination(
         map,
-        start='E',
-        end='a',
+        start_char='E',
+        end_char='a',
         uphill=False,
     )
 

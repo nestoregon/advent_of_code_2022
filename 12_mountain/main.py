@@ -46,7 +46,7 @@ def locate_character(map: List[str], character: str) -> Tuple[int, int]:
 
 
 def initialize_map(map: List[str], value):
-    return [[value for i in range(len(map[0]))] for j in range(len(map))]
+    return [[value for _ in range(len(map[0]))] for _ in range(len(map))]
 
 
 def sort_nodes(nodes: List[Node], reverse=True) -> List[Node]:

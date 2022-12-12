@@ -52,12 +52,14 @@ def sort_nodes_based_on_score(nodes: List[Node], reverse=True) -> List[Node]:
     return sorted(nodes, key=lambda x: x.score, reverse=reverse)
 
 
-def get_fewest_steps_to_reach_destination(map: List[str], start_char: str, end_char: str, uphill: bool):
+def get_fewest_steps_to_reach_destination(
+    map: List[str], start_letter: str, end_letter: str, uphill: bool
+):
 
     # initialize variables
-    current_x, current_y = locate_character(map, start_char)
-    value_matrix = initialize_copy_of_map_with_default_value(map, value=-1)
-    value_matrix[current_x][current_y] = 1  # keeping track of node iterations
+    current_x, current_y = locate_character(map, start_letter)
+    iter_map = initialize_copy_of_map_with_default_value(map, value=-1)
+    iter_map[current_x][current_y] = 1  # keeping track of node iterations
     min_value = None
     alive_nodes = [Node(current_x, current_y, 1, 1)]  # first node
 
@@ -78,7 +80,7 @@ def get_fewest_steps_to_reach_destination(map: List[str], start_char: str, end_c
             if nx < 0 or ny < 0 or nx >= len(map) or ny >= len(map[0]):
                 continue  # not valid
 
-            if value_matrix[nx][ny] != -1 and value_matrix[nx][ny] <= node.iterations:
+            if iter_map[nx][ny] != -1 and iter_map[nx][ny] <= node.iterations:
                 continue  # not valid
 
             new_height = get_map_height_from_letter(map[nx][ny])
@@ -90,14 +92,14 @@ def get_fewest_steps_to_reach_destination(map: List[str], start_char: str, end_c
             if not uphill and height_difference < -1:
                 continue  # We cannot go down more than 1 height
 
-            value_matrix[nx][ny] = node.iterations
+            iter_map[nx][ny] = node.iterations  # update
 
             # are we there yet?
-            if map[nx][ny] == end_char:
+            if map[nx][ny] == end_letter:
                 if min_value is None:
                     min_value = node.iterations
                 else:
-                    min_value = min(min_value, node.iterations)
+                    min_value = min(min_value, node.iterations)  # udpate
 
             # we found a potential good node to follow up on. Add it to alive ones
             alive_nodes.append(
@@ -116,15 +118,15 @@ def main():
     map = read_input_as_lines('input.txt')
     value_uphill = get_fewest_steps_to_reach_destination(
         map,
-        start_char='S',
-        end_char='E',
+        start_letter='S',
+        end_letter='E',
         uphill=True,
     )
 
     value_downhill = get_fewest_steps_to_reach_destination(
         map,
-        start_char='E',
-        end_char='a',
+        start_letter='E',
+        end_letter='a',
         uphill=False,
     )
 

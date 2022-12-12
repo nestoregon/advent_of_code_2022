@@ -6,6 +6,7 @@ Keeping a list of alive nodes and having an optimization function to prioritize 
 from typing import List, Tuple
 from dataclasses import dataclass
 
+# TODO: arrows not used
 MOVEMENTS_TO_ARROWS = {
     (0, 1): '>',  # right
     (1, 0): 'V',  # down
@@ -29,7 +30,7 @@ def read_input_as_lines(input_path: str) -> List[str]:
     return lines
 
 
-def get_value_given_letter(letter: str) -> int:
+def get_map_height_from_letter(letter: str) -> int:
     if 'S' == letter: return 0
     if 'E' == letter: return 26
     return ord(letter) - 96
@@ -45,11 +46,11 @@ def locate_character(map: List[str], character: str) -> Tuple[int, int]:
     raise Exception(f'{character} not found')
 
 
-def initialize_map(map: List[str], value):
+def initialize_map_copy_with_value(map: List[str], value):
     return [[value for _ in range(len(map[0]))] for _ in range(len(map))]
 
 
-def sort_nodes(nodes: List[Node], reverse=True) -> List[Node]:
+def sort_nodes_based_on_score(nodes: List[Node], reverse=True) -> List[Node]:
     return sorted(nodes, key=lambda x: x.score, reverse=reverse)
 
 
@@ -57,19 +58,18 @@ def get_fewest_steps_to_reach_destination(map: List[str], start: str, end: str, 
 
     # initialize variables
     current_x, current_y = locate_character(map, start)
-    value_matrix = initialize_map(map, value=-1)
-    starting_node = Node(current_x, current_y, 1, 1)
-    alive_nodes = [starting_node]
+    value_matrix = initialize_map_copy_with_value(map, value=-1)
     value_matrix[current_x][current_y] = 1  # keeping track of node iteratinos
     min_value = None
+    alive_nodes = [Node(current_x, current_y, 1, 1)]  # first node
 
     # keep looping until there is no more alives nodes
     while len(alive_nodes) > 0:
 
         # TODO: implement bounding algorithm!
-        alive_nodes = sort_nodes(alive_nodes, uphill)  # sorting
+        alive_nodes = sort_nodes_based_on_score(alive_nodes, uphill)
         node = alive_nodes.pop(0)  # check out most promising node!
-        value = get_value_given_letter(map[node.x][node.y])  # get value of map
+        height = get_map_height_from_letter(map[node.x][node.y])  # get value of map
 
         # for each of the 4 directions
         for dx, dy in MOVEMENTS_TO_ARROWS:
@@ -82,14 +82,14 @@ def get_fewest_steps_to_reach_destination(map: List[str], start: str, end: str, 
             if value_matrix[nx][ny] != -1 and value_matrix[nx][ny] <= node.iterations:
                 continue  # not valid
 
-            new_value = get_value_given_letter(map[nx][ny])
-            diff = new_value - value
+            new_height = get_map_height_from_letter(map[nx][ny])
+            height_difference = new_height - height
 
-            if uphill and diff > 1:
-                continue  # not valid
+            if uphill and height_difference > 1:
+                continue  # We cannot climb more than 1 height
 
-            if not uphill and diff < -1:
-                continue  # not valid
+            if not uphill and height_difference < -1:
+                continue  # We cannot go down more than 1 height
 
             value_matrix[nx][ny] = node.iterations
 
@@ -105,7 +105,7 @@ def get_fewest_steps_to_reach_destination(map: List[str], start: str, end: str, 
                     x=nx,
                     y=ny,
                     iterations=node.iterations + 1,
-                    score=new_value,
+                    score=new_height,
                 )
             )
 

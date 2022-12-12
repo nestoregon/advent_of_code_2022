@@ -46,17 +46,7 @@ def locate_character(map: List[str], character: str) -> Tuple[int, int]:
 
 
 def initialize_map(map: List[str], value):
-    length_x = len(map)
-    length_y = len(map[0])
-
-    visited = []
-    for _ in range(length_x):
-        row = []
-        for _ in range(length_y):
-            row.append(value)
-        visited.append(row)
-
-    return visited
+    return [[value for i in range(len(map[0]))] for j in range(len(map))]
 
 
 def sort_nodes(nodes: List[Node], reverse=True) -> List[Node]:
@@ -67,7 +57,7 @@ def get_fewest_steps_to_reach_destination(map: List[str], start: str, end: str, 
 
     # initialize variables
     current_x, current_y = locate_character(map, start)
-    value_matrix = initialize_map(map, -1)
+    value_matrix = initialize_map(map, value=-1)
     starting_node = Node(current_x, current_y, 1, 1)
     alive_nodes = [starting_node]
     value_matrix[current_x][current_y] = 1  # keeping track of node iteratinos
@@ -124,7 +114,6 @@ def get_fewest_steps_to_reach_destination(map: List[str], start: str, end: str, 
 
 def main():
     map = read_input_as_lines('input.txt')
-
     value_uphill = get_fewest_steps_to_reach_destination(
         map,
         start='S',

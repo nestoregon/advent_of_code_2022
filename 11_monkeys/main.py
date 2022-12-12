@@ -1,5 +1,5 @@
 """
-part 1: brute computing
+part 1: brute force following instructions
 part 2: use least common multiple in order to keep reminder calcualtion simple
 """
 from typing import List
@@ -9,8 +9,8 @@ from dataclasses import dataclass
 @dataclass
 class Monkey:
     items: List
-    divisible_by: int
     operation: str
+    divisible_by: int
     true: int
     false: int
 

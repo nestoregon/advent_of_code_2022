@@ -54,7 +54,7 @@ def monkey_game(monkeys: List[Monkey]):
     }
 
     for part in [1, 2]:
-        for _ in range(part_to_iterations[part]):
+        for _ in range(part_to_iterations[part]):  # iterate
             for i, monkey in enumerate(monkeys):
                 counter_items[i] += len(monkey.items)
 

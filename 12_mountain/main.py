@@ -44,7 +44,7 @@ def locate_character(map: List[str], character: str) -> Tuple[int, int]:
     raise Exception(f'{character} not found in map')
 
 
-def initialize_map_copy_with_value(map: List[str], value):
+def initialize_copy_of_map_with_default_value(map: List[str], value):
     return [[value for _ in range(len(map[0]))] for _ in range(len(map))]
 
 
@@ -56,20 +56,21 @@ def get_fewest_steps_to_reach_destination(map: List[str], start: str, end: str, 
 
     # initialize variables
     current_x, current_y = locate_character(map, start)
-    value_matrix = initialize_map_copy_with_value(map, value=-1)
-    value_matrix[current_x][current_y] = 1  # keeping track of node iteratinos
+    value_matrix = initialize_copy_of_map_with_default_value(map, value=-1)
+    value_matrix[current_x][current_y] = 1  # keeping track of node iterations
     min_value = None
     alive_nodes = [Node(current_x, current_y, 1, 1)]  # first node
 
-    # keep looping until there is no more alives nodes
+    # keep looping until there are no more alive nodes
     while len(alive_nodes) > 0:
 
-        # TODO: implement bounding algorithm!
+        # select the most promissing alive node!
         alive_nodes = sort_nodes_based_on_score(alive_nodes, uphill)
-        node = alive_nodes.pop(0)  # check out most promising node!
-        height = get_map_height_from_letter(map[node.x][node.y])  # get value of map
+        node = alive_nodes.pop(0)
+        height = get_map_height_from_letter(map[node.x][node.y])
 
         # for each of the 4 directions
+        # all "continue" are instances where new nodes are not good.
         for dx, dy in MOVEMENTS_TO_ARROWS:
             nx = node.x + dx
             ny = node.y + dy
@@ -98,6 +99,7 @@ def get_fewest_steps_to_reach_destination(map: List[str], start: str, end: str, 
                 else:
                     min_value = min(min_value, node.iterations)
 
+            # we found a potential good node to follow up on. Add it to alive ones
             alive_nodes.append(
                 Node(
                     x=nx,

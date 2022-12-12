@@ -1,3 +1,8 @@
+"""
+Solved using branch and bound algorithm.
+Keeping a list of alive nodes and having an optimization function to prioritize alive nodes.
+"""
+
 from typing import List, Tuple
 from dataclasses import dataclass
 
@@ -9,16 +14,6 @@ MOVEMENTS_TO_ARROWS = {
 }
 
 
-def get_distance_to_end(cx, cy, ex, ey):
-    return abs(ex - cx) + abs(ey - cy)
-
-
-def get_value_given_letter(letter: str) -> int:
-    if 'S' == letter: return 0
-    if 'E' == letter: return 26
-    return ord(letter) - 96
-
-
 @dataclass
 class Node:
     x: int
@@ -26,30 +21,18 @@ class Node:
     iterations: int
     score: int
 
-    def set_node_score(self, map: List[str], ex: int, ey: int):
-        """Mix between how high you are and the distance to the end"""
-        distance = get_distance_to_end(self.x, self.y, ex, ey)
-        value = self.get_value_height(map)
-        self.score = max([distance, value])
-
-    def get_value_height(self, map):
-        return 26 - get_value_given_letter(map[self.x][self.y])
-
-    def get_node_optimistic(self, map: List[str], ex: int, ey: int) -> int:
-        """Mix between how high you are and the distance to the end"""
-        distance = get_distance_to_end(self.x, self.y, ex, ey)
-        value = self.get_value_height(map)
-        return min([distance, value])
-
-    def set_node_score_height(self, height):
-        self.score = height
-
 
 def read_input_as_lines(input_path: str) -> List[str]:
     with open(input_path) as f:
         lines = f.readlines()
     lines = [line.strip() for line in lines]
     return lines
+
+
+def get_value_given_letter(letter: str) -> int:
+    if 'S' == letter: return 0
+    if 'E' == letter: return 26
+    return ord(letter) - 96
 
 
 def locate_character(map: List[str], character: str) -> Tuple[int, int]:
@@ -76,135 +59,75 @@ def initialize_map(map: List[str], value):
     return visited
 
 
-def sort_nodes(nodes: List[Node], map: List[str], ex, ey) -> List[Node]:
-    for node in nodes:
-        node.set_node_score(map, ex, ey)
-    return sorted(nodes, key=lambda x: x.score)
+def sort_nodes(nodes: List[Node], reverse=True) -> List[Node]:
+    return sorted(nodes, key=lambda x: x.score, reverse=reverse)
 
 
-def sort_node_inverse(nodes, map):
-    for node in nodes:
-        node.set_node_score_height(map[node.x][node.y])
-    return sorted(nodes, key=lambda x: x.score)
+def get_path(map: List[str], start_char: str, end_char: str, uphill: bool):
 
-
-def remove_nodes(nodes: List[Node], map, value_matrix: List[List[int]], ex, ey):
-    alive_nodes = []
-    target = value_matrix[ex][ey]
-
-    for node in nodes:
-        if node.get_node_optimistic(map, ex, ey) < target:
-            alive_nodes.append(node)
-
-    return alive_nodes
-
-
-def get_path_inverse(map: List[str]):
-    print('problem 2')
-    sx, sy = locate_character(map, 'E')
+    # initialize variables
+    current_x, current_y = locate_character(map, start_char)
     value_matrix = initialize_map(map, -1)
-
-    cx, cy = sx, sy
-
-    starting_node = Node(cx, cy, 1, -1)
+    starting_node = Node(current_x, current_y, 1, 1)
     alive_nodes = [starting_node]
-    value_matrix[cx][cy] = 1
-    lowest_score = 100_000_000
+    value_matrix[current_x][current_y] = 1  # keeping track of node iteratinos
+    min_value = None
 
+    # keep looping until there is no more alives nodes
     while len(alive_nodes) > 0:
 
-        alive_nodes = sort_node_inverse(alive_nodes, map)
-
-        # alive_nodes = remove_nodes(alive_nodes, value_matrix, ex, ey)  # sorting
-        node = alive_nodes.pop(0)  # Expand most promising node
+        # TODO: implement bounding algorithm!
+        alive_nodes = sort_nodes(alive_nodes, uphill)  # sorting
+        node = alive_nodes.pop(0)  # check out most promising node!
         value = get_value_given_letter(map[node.x][node.y])  # get value of map
 
+        # for each of the 4 directions
         for dx, dy in MOVEMENTS_TO_ARROWS:
             nx = node.x + dx
             ny = node.y + dy
 
             if nx < 0 or ny < 0 or nx >= len(map) or ny >= len(map[0]):
-                continue  # node not added
+                continue  # not valid
 
             if value_matrix[nx][ny] != -1 and value_matrix[nx][ny] <= node.iterations:
                 continue  # not valid
 
-            diff = get_value_given_letter(map[nx][ny]) - value
-            if diff < -1:
+            new_value = get_value_given_letter(map[nx][ny])
+            diff = new_value - value
+            if uphill and diff > 1:
                 continue  # not valid
-
-            value_matrix[nx][ny] = node.iterations
-            if map[nx][ny] == 'a':
-                if lowest_score > node.iterations:
-                    lowest_score = node.iterations
-                    print('End reached with score', node.iterations)
-
-            alive_nodes.append(Node(
-                x=nx,
-                y=ny,
-                iterations=node.iterations + 1,
-                score=-1,
-            ))
-
-    return lowest_score
-
-
-def get_path(map: List[str]):
-    print('problem 1')
-    sx, sy = locate_character(map, 'S')
-    ex, ey = locate_character(map, 'E')
-    # visited = initialize_map(map, '.')
-    value_matrix = initialize_map(map, -1)
-
-    cx, cy = sx, sy
-
-    starting_node = Node(cx, cy, 1, -1)
-    alive_nodes = [starting_node]
-    value_matrix[cx][cy] = 1
-
-    while len(alive_nodes) > 0:
-
-        alive_nodes = sort_nodes(alive_nodes, map, ex, ey)  # sorting
-
-        # alive_nodes = remove_nodes(alive_nodes, value_matrix, ex, ey)  # sorting
-        node = alive_nodes.pop(0)  # Expand most promising node
-        value = get_value_given_letter(map[node.x][node.y])  # get value of map
-
-        for dx, dy in MOVEMENTS_TO_ARROWS:
-            nx = node.x + dx
-            ny = node.y + dy
-
-            if nx < 0 or ny < 0 or nx >= len(map) or ny >= len(map[0]):
-                continue  # node not added
-
-            if value_matrix[nx][ny] != -1 and value_matrix[nx][ny] <= node.iterations:
-                continue  # not valid
-
-            diff = get_value_given_letter(map[nx][ny]) - value
-            if diff > 1:
+            if not uphill and diff < -1:
                 continue  # not valid
 
             value_matrix[nx][ny] = node.iterations
 
-            if nx == ex and ny == ey:
-                print('End reached with score', node.iterations)
-                continue  # reached final point
+            # is it the end?
+            if map[nx][ny] == end_char:
+                if min_value is None:
+                    min_value = node.iterations
+                else:
+                    min_value = min(min_value, node.iterations)
 
-            alive_nodes.append(Node(
-                x=nx,
-                y=ny,
-                iterations=node.iterations + 1,
-                score=-1,
-            ))
+            alive_nodes.append(
+                Node(
+                    x=nx,
+                    y=ny,
+                    iterations=node.iterations + 1,
+                    score=new_value,
+                )
+            )
 
-    return value_matrix[ex][ey]
+    return min_value
 
 
 def main():
     map = read_input_as_lines('input.txt')
-    value = get_path(map)
-    value = get_path_inverse(map)
-    print(value)
+
+    value_a = get_path(map, 'S', 'E', uphill=True)
+    print(f'Problem 1: {value_a}')
+
+    value_b = get_path(map, 'E', 'a', uphill=False)
+    print(f'Problem 2: {value_b}')
 
 
 if __name__ == '__main__':

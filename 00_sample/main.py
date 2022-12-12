@@ -7,4 +7,10 @@ def read_input_as_lines(input_path: str) -> List[str]:
     lines = [line.strip() for line in lines]
     return lines
 
-input = read_input_as_lines('input.txt')
+
+def main():
+    input = read_input_as_lines('easy_input.txt')
+
+
+if __name__ == '__main__':
+    main()

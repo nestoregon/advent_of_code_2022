@@ -37,9 +37,7 @@ def get_map_height_from_letter(letter: str) -> int:
 
 
 def locate_character(map: List[str], character: str) -> Tuple[int, int]:
-    for x, line in enumerate(map):
-        if character not in line:
-            continue
+    for x in range(len(map)):
         for y in range(len(map[0])):
             if map[x][y] == character:
                 return x, y

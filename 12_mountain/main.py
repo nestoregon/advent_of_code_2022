@@ -63,10 +63,10 @@ def sort_nodes(nodes: List[Node], reverse=True) -> List[Node]:
     return sorted(nodes, key=lambda x: x.score, reverse=reverse)
 
 
-def get_path(map: List[str], start_char: str, end_char: str, uphill: bool):
+def get_fewest_steps_to_reach_destination(map: List[str], start: str, end: str, uphill: bool):
 
     # initialize variables
-    current_x, current_y = locate_character(map, start_char)
+    current_x, current_y = locate_character(map, start)
     value_matrix = initialize_map(map, -1)
     starting_node = Node(current_x, current_y, 1, 1)
     alive_nodes = [starting_node]
@@ -94,15 +94,17 @@ def get_path(map: List[str], start_char: str, end_char: str, uphill: bool):
 
             new_value = get_value_given_letter(map[nx][ny])
             diff = new_value - value
+
             if uphill and diff > 1:
                 continue  # not valid
+
             if not uphill and diff < -1:
                 continue  # not valid
 
             value_matrix[nx][ny] = node.iterations
 
-            # is it the end?
-            if map[nx][ny] == end_char:
+            # are we there yet?
+            if map[nx][ny] == end:
                 if min_value is None:
                     min_value = node.iterations
                 else:
@@ -123,11 +125,22 @@ def get_path(map: List[str], start_char: str, end_char: str, uphill: bool):
 def main():
     map = read_input_as_lines('input.txt')
 
-    value_a = get_path(map, 'S', 'E', uphill=True)
-    print(f'Problem 1: {value_a}')
+    value_uphill = get_fewest_steps_to_reach_destination(
+        map,
+        start='S',
+        end='E',
+        uphill=True,
+    )
 
-    value_b = get_path(map, 'E', 'a', uphill=False)
-    print(f'Problem 2: {value_b}')
+    value_downhill = get_fewest_steps_to_reach_destination(
+        map,
+        start='E',
+        end='a',
+        uphill=False,
+    )
+
+    print(f'Problem 1: {value_uphill}')
+    print(f'Problem 2: {value_downhill}')
 
 
 if __name__ == '__main__':

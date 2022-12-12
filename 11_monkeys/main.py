@@ -1,3 +1,7 @@
+"""
+part 1: brute computing
+part 2: use least common multiple in order to keep reminder calcualtion simple
+"""
 from typing import List
 from dataclasses import dataclass
 
@@ -39,9 +43,9 @@ def parse_input(input: List[str]) -> List[Monkey]:
 
 def monkey_game(monkeys: List[Monkey]):
 
-    lowest_common_multiple = 1
+    least_common_multiple = 1
     for monkey in monkeys:
-        lowest_common_multiple *= (monkey.divisible_by)
+        least_common_multiple *= (monkey.divisible_by)
 
     counter_items = [0] * len(monkeys)
     part_to_iterations = {
@@ -60,7 +64,7 @@ def monkey_game(monkeys: List[Monkey]):
                     if part == 1:
                         stress_level = stress_level // 3
                     if part == 2:
-                        stress_level %= lowest_common_multiple  # reduce number
+                        stress_level %= least_common_multiple  # reduce stress
 
                     if stress_level % monkey.divisible_by == 0:
                         next_monkey = monkey.true

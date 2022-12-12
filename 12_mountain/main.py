@@ -41,7 +41,7 @@ def locate_character(map: List[str], character: str) -> Tuple[int, int]:
         for y in range(len(map[0])):
             if map[x][y] == character:
                 return x, y
-    raise Exception(f'{character} not found')
+    raise Exception(f'{character} not found in map')
 
 
 def initialize_map_copy_with_value(map: List[str], value):

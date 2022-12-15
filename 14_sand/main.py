@@ -43,8 +43,6 @@ def initialize_map_frmo_rock_lines(input: List[str]) -> Set[Tuple[int, int]]:
 
             rock_points.add((max(sorted_x), max(sorted_y)))
 
-    # rock_points = array(rock_points, int)
-
     return rock_points
 
 
@@ -60,7 +58,7 @@ def print_map_given_points(
     lowest_y, highest_y = y_points[0], y_points[-1]
 
     for y in range(lowest_y, highest_y + 1):
-        line = f'{y} '
+        line = f'{str(y).zfill(len(str(highest_y)))} '
         for x in range(lowest_x, highest_x + 1):
             if (x, y) in rock_points:
                 line += '#'
@@ -72,6 +70,7 @@ def print_map_given_points(
                 line += '.'
 
         print(line)
+    print()
 
 
 def get_type_of_x_and_y(x, y, points: List[Point]):
@@ -99,6 +98,7 @@ def main():
     start_point = (500, 0)
     sand_points = set()
 
+    print('Initial State')
     print_map_given_points(
         rock_points=rock_points,
         sand_points=sand_points,
@@ -107,7 +107,6 @@ def main():
 
     # directions = [[0, 1], [-1, 1], [1, 1]]
     lowest_y = max(sorted([point[1] for point in rock_points.union({start_point})]))
-
 
     within_map = True
     sand_points = set()
@@ -122,6 +121,7 @@ def main():
                 if part_one:
                     part_one = False
                     print(f'Part 1: {len(sand_points)}')
+                    print_map_given_points(rock_points, sand_points, {start_point})
                 break
             elif (sand[0], sand[1] + 1) not in all_points:
                 sand = (sand[0], sand[1] + 1)
@@ -135,14 +135,8 @@ def main():
         sand_points.add(sand)
         if sand == start_point:  # end
             print(f'Part 2: {len(sand_points)}')
+            print_map_given_points(rock_points, sand_points, {start_point})
             break
-
-    print_map_given_points(
-        rock_points=rock_points,
-        sand_points=sand_points,
-        start_point={start_point},
-    )
-
 
 
 if __name__ == '__main__':

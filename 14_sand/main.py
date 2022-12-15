@@ -133,7 +133,8 @@ def main():
                 break
 
         sand_points.add(sand)
-        if sand == start_point:
+        if sand == start_point:  # end
+            print(f'Part 2: {len(sand_points)}')
             break
 
     print_map_given_points(
@@ -142,7 +143,6 @@ def main():
         start_point={start_point},
     )
 
-    print(f'Part 2: {len(sand_points)}')
 
 
 if __name__ == '__main__':

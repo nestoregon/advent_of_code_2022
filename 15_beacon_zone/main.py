@@ -18,6 +18,11 @@ Given a line, (-), you can calculate interections (i)
 ......................................................
 
 These intersection points (i) will be useful to solve the problems.
+
+
+TODO: Decrease execution time for problem 2, takes 1 minute now.
+
+Solution 1 was very clean though, quite proud!
 """
 from typing import List, Set, Tuple
 from dataclasses import dataclass
@@ -65,6 +70,11 @@ def is_point_seen_by_sensors(x, y, sensors):
     return False
 
 
+def get_number_of_unique_beacons_in_y_coordinate(beacons, y_coordinate):
+    beacons_in_y = set([x[0] for x in beacons if x[0] == y_coordinate])
+    return len(beacons_in_y)  # take out beacons in the same line
+
+
 def get_total_coverage_by_line(sensors, beacons, y_coordinate):
     """
     The goal is to find the coverage of a line.
@@ -103,8 +113,8 @@ def get_total_coverage_by_line(sensors, beacons, y_coordinate):
         sensors_within_range += SIDE_TO_PARENTHESIS[intersection.side]
         previous = intersection  # udpate
 
-    beacons_in_y = set([x[0] for x in beacons if x[0] == y_coordinate])
-    covered -= len(beacons_in_y)  # take out beacons in the same line
+    # take out all becons in the same line
+    covered -= get_number_of_unique_beacons_in_y_coordinate(beacons, y_coordinate)
 
     return covered
 

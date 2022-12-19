@@ -58,7 +58,7 @@ def sort_all_intersections_according_to_x_value(intersections) -> List[Intersect
     return sorted(intersections, key=lambda x: x.x)
 
 
-def is_point_seen_any_by_sensor(x, y, sensors):
+def is_point_seen_by_sensors(x, y, sensors):
     for sx, sy, distance in sensors:
         if abs(x - sx) + abs(y - sy) <= distance:
             return True
@@ -138,9 +138,9 @@ def get_missing_beacon(sensors: Set, iters: int) -> Tuple:
 
             if difference == 2 and intersection.x - y_coordinate < iters:  # is what we're looking for?
                 x = intersection.x - 1  # we're at an edge, so let's get the point to the left
-                if not is_point_seen_any_by_sensor(x, y_coordinate, sensors):  # not seen!
-                    upper_point_seen = is_point_seen_any_by_sensor(x, y_coordinate + 1, sensors)
-                    lower_point_seen = is_point_seen_any_by_sensor(x, y_coordinate - 1, sensors)
+                if not is_point_seen_by_sensors(x, y_coordinate, sensors):  # not seen!
+                    upper_point_seen = is_point_seen_by_sensors(x, y_coordinate + 1, sensors)
+                    lower_point_seen = is_point_seen_by_sensors(x, y_coordinate - 1, sensors)
 
                     if upper_point_seen and lower_point_seen:
                         return (x, y_coordinate)  # we found the sneaky beacon

@@ -77,7 +77,7 @@ def get_total_coverage_by_line(sensors, beacons, y_coordinate):
 
     line = i#####i###i###########i....................i#########i..........
 
-    - We get all the intersections (i). There are always two intersections (right and left)
+    - We get all the intersections (i). There are can be two intersections (right and left) for a given sensor
     - We sort them according to X (left to right)
         - We go from left to right. If we encounter a left edge, then we're being seen by a sensor.
         - If we encounter a righ one, means that we're out of the range

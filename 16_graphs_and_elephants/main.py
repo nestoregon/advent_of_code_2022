@@ -109,7 +109,7 @@ def save_graph_to_image(graph, image_name: str = 'graph.png'):
 
 
 def main():
-    input = read_input_as_lines('easy_input.txt')
+    input = read_input_as_lines('input.txt')
     graph = transform_input_to_graph_nx(input)
     get_greedy_method(graph, minutes_avaliable=30)
     save_graph_to_image(graph)

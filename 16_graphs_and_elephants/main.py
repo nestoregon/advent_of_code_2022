@@ -52,23 +52,27 @@ def find_next_room_with_most_gain(
             continue
 
         gain = remaining_time * valve_values[room]
-        room_to_gain[room] = (gain, remaining_time)
+        gain_ratio = gain / (time_consumed + 1)  # how much gain per time
+
+        room_to_gain[room] = (gain, remaining_time, gain_ratio)
 
     if len(room_to_gain) == 0:
-        return 0, 0, 0
+        return 0, 0, 0, 0
 
-    room_to_gain = dict(sorted(room_to_gain.items(), key=lambda item: item[1], reverse=True))
+    room_to_gain = dict(sorted(room_to_gain.items(), key=lambda item: item[1][2], reverse=True))
     best_choice = next(iter(room_to_gain))
-    best_gain, time = room_to_gain[best_choice]
+    best_gain, time, best_gain_ratio = room_to_gain[best_choice]
 
-    return best_choice, best_gain, time
+    return best_choice, best_gain, time, best_gain_ratio
 
 
 def get_greedy_method(graph, minutes_avaliable: int) -> int:
-    valve_values = nx.get_node_attributes(graph, "valve_value")
-    valve_values = {k: v
-                    for k, v in valve_values.items() if v > 0}
-    valve_values = dict(sorted(valve_values.items(), key=lambda item: item[1], reverse=True))
+    room_to_valve_value = nx.get_node_attributes(graph, "valve_value")
+    room_to_valve_value = {k: v
+                           for k, v in room_to_valve_value.items() if v > 0}
+    room_to_valve_value = dict(
+        sorted(room_to_valve_value.items(), key=lambda item: item[1], reverse=True)
+    )
     shortest_paths = dict(nx.all_pairs_shortest_path_length(graph))
 
     score = 0
@@ -77,19 +81,20 @@ def get_greedy_method(graph, minutes_avaliable: int) -> int:
 
     print(f'GREEDY: Starting at {current_room}, score {score}')
     while minutes_avaliable > 0:
-        next_room, gain, minutes_avaliable = find_next_room_with_most_gain(
+        next_room, gain, minutes_avaliable, gain_ratio = find_next_room_with_most_gain(
             current_room,
-            valve_values,
+            room_to_valve_value,
             shortest_paths,
             minutes_avaliable,
             rooms_visited,
         )
         if next_room == 0:  # there's nothing else to do.
             break
+
         score += gain
         print(
             f'- From {current_room} is best to go to {next_room}, with a gain '
-            f'of {gain} and {minutes_avaliable} minutes available & score = {score}'
+            f'of {gain} ({int(gain_ratio)}) and {minutes_avaliable} minutes available & score = {score}'
         )
         rooms_visited.add(next_room)
         current_room = next_room  # update
@@ -109,7 +114,7 @@ def save_graph_to_image(graph, image_name: str = 'graph.png'):
 
 
 def main():
-    input = read_input_as_lines('input.txt')
+    input = read_input_as_lines('easy_input.txt')
     graph = transform_input_to_graph_nx(input)
     get_greedy_method(graph, minutes_avaliable=30)
     save_graph_to_image(graph)
